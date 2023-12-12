@@ -5,139 +5,134 @@ EXTENDS Integers, TLC, Sequences
 variables
     c = FALSE;
     sleep_ticks = 0;
-    i = TRUE,
-    p = FALSE,
-    b = FALSE,
-    u1 = FALSE,
-    u2 = FALSE,
-    menu = FALSE,
-    out = FALSE,
-    in = FALSE,
-    card = 1101,
-    balance = 2000,
-    count_wrong = 0,
+    i = TRUE;
+    p = FALSE;
+    b = FALSE;
+    u = FALSE;
+    menu = FALSE;
+    out = FALSE;
+    in = FALSE;
+    card = 1101;
+    balance = 2000;
+    count_wrong = 0;
     number_of_actions = 9;
-    button_stack = <<1, 1234, 1 , 2 ,700, 1, 3, 1, 4>>;
-    stack_ptr = 1,
-    button,
+    actions_stack = <<1, 1234, 1 , 2 ,700, 1, 3, 1, 4>>;
+    stack_ptr = 1;
+    button = 0;
     correct_pin = 1234;
+    
 define
 \*SAFETY
     NoUseBlocked == (b ~> ~p)
     NoJustCurtain == (c ~> (i /\ p))
     NoOpenCurtain == ((in \/ out) ~> ~c)
     NoMenuWOPin == (menu ~> p)
-    NoRandomBalanceUpdate == (u2 ~> (in \/ out))
-    FalseStatement == (menu ~> b)
+    NoRandomBalanceUpdate == (u ~> (in \/ out))
+    FalseStatement == (menu ~> b) \* For check
+    
 \*    LIVENESS
-    WillMenu == (p ~> <>menu)
-    WillTerminate == <>(~i \/ b)
-    WillUpdate == ((in \/ out) ~> (<>u1))
-    \* h == p \/ b \/ menu
-    \*NoInfLoopAuth == (i ~> (h \/ h'))
+\*    WillMenu == (p ~> <>menu)
+\*    WillTerminate == [](<><<~i \/ b>>_vars)
+\*    WillUpdate == ((in \/ out) ~> (<>u))
 end define
-procedure Auth()
-variables
-    pin,
-begin
-    input_pin: call ButtonStack();
-    pin_defined: pin := button;
-s1: if pin = correct_pin /\ ~b then
-        count_wrong := 0;
-        p := TRUE;
-        call Menu();
-    else count_wrong := count_wrong + 1; end if;
-    s12: if count_wrong >= 2 then
-        count_wrong := 0;
-        b := TRUE;
-    end if;
-    to_init: return;
-end procedure;
 
-procedure ButtonStack()
-begin
-    s_button: button := button_stack[stack_ptr];
-    if stack_ptr <= number_of_actions then
-        s_stack_ptr: stack_ptr := stack_ptr + 1;
-    else menu:= FALSE; p:=FALSE; i:=FALSE; end if;
-    input2: return;
-end procedure
-
-procedure Menu()
-begin
-menu_p0: menu := TRUE;
-t := 0;
-s2: while(t <= sleep_ticks /\ p) do
-        call ButtonStack();
-menu_p3:menu := FALSE;
-      set_t0: t := t + 1;
-        s_if_p: if (p = TRUE) then
-        s3_0: if button = 1 then print <<balance>>; t:= 0; end if;
-        s4_0: if button = 2 then call Withdrawal(); set_t1:t:= 0;end if;
-        s8_0: if button = 3 then call Deposit();set_t2: t:= 0;end if;
-    menu_p1:  menu := TRUE;
-        s1_0: if button = 4 then menu:= FALSE; p:=FALSE; i:=FALSE; end if;
-        end if;
-    end while;
-menu_p2:menu := FALSE;
-    too_auth: return;
-end procedure;
-
-procedure Deposit()
-variables
-    t = 0,
-    sum = 500;
-begin
-s8_0:c := TRUE;
-s8: while(t<sleep_ticks) do
-        t := t + 1;
-    end while;
-s9: c := FALSE;
-    in := TRUE;
-u_p2: u1 := TRUE;
-u2_p2: u2 := TRUE;
-s11:call UpdateBalance(sum);
-to_menu_8:return;
+procedure UpdateBalance(tsum) begin
+    s7:
+    balance := balance + tsum;
+    u := FALSE || in := FALSE || out := FALSE;
+    return;
 end procedure;
 
 procedure Withdrawal()
 variables
-    t = 0,
-    sum = 0;
+    t = 0, sum = 500;
 begin
-s4: call ButtonStack();
-    setting_sum: sum:= button;
+    s4: 
+    call ButtonStack();
+    user: sum:= button;
+    s5: 
     if sum <= balance then
         c := TRUE;
         t := 0;
-s5: while(t < sleep_ticks) do
-        t := t + 1;
-    end while;
-    c := FALSE;
-    out := TRUE;
-u_p1:u1 := TRUE;
-u2_p1:u2 := TRUE;
-s7: call UpdateBalance(-sum);
-
+        s6: 
+        c := FALSE || out := TRUE || u := TRUE;
+        call UpdateBalance(-sum);
     end if;
-to_menu_1: return;
+    return_to_menu: return;
 end procedure;
 
-procedure UpdateBalance(sum)
-begin
-s7: balance := balance + sum;
-u2_p0:u2 := FALSE;
-in_p0:in := FALSE;
-out_p0:out := FALSE;
-u_p0:u1 := FALSE;
-to_menu_2: return;
-end procedure;
-
-process Main = "Main"
+procedure Deposit() 
 variables
+    t = 0, sum = 500;
 begin
-s0: while(~b /\ i) do
+    s8:
+    c := TRUE;
+    s9:
+    c := FALSE || in := TRUE || u := TRUE;
+    call UpdateBalance(sum);
+    return;
+end procedure;
+
+procedure Menu()
+variables
+    t = 0;
+begin
+    s2:
+    menu := TRUE;
+    menu:
+    while(t <= sleep_ticks /\ p) do
+        call ButtonStack();
+        cycle_step: menu := FALSE || t := t + 1;
+        if (p = TRUE) then
+            s3:
+            if button = 1 then print <<balance>>; t:= 0; end if;
+            s4:
+            if button = 2 then call Withdrawal(); t1: t:= 0; end if;
+            s8:
+            if button = 3 then call Deposit(); t2: t:= 0; end if;
+            s0:
+            if button = 4 then menu:= FALSE || p:=FALSE || i:=FALSE; end if;
+        end if;
+    end while;
+    menu:= FALSE || p:=FALSE || i:=FALSE;
+    return;
+end procedure;
+
+procedure ButtonStack() begin
+    user:
+    button := actions_stack[stack_ptr];
+    s0:
+    if stack_ptr <= number_of_actions then
+        stack_ptr := stack_ptr + 1;
+    else menu:= FALSE || p:=FALSE || i:=FALSE; end if;
+    return;
+end procedure;
+
+procedure Auth()
+variables
+    pin = 0;
+begin
+    s1:
+    call ButtonStack();
+    user: pin := button;
+    s2:
+    if pin = correct_pin /\ ~b then
+        count_wrong := 0 || p := TRUE;
+        call Menu();
+    else count_wrong := count_wrong + 1; end if;
+    s12:
+    if count_wrong >= 2 then
+        count_wrong := 0 || b := TRUE;
+    end if;
+    return;
+end procedure;
+
+process Main = "Main" begin
+    s0:
+    while(~b /\ i) do
         call Auth();
     end while;
 end process;
+
 end algorithm;*)
+====
