@@ -30,10 +30,10 @@ define
     NoRandomBalanceUpdate == (u ~> (in \/ out))
     FalseStatement == (menu ~> b) \* For check
     
-\*    LIVENESS
-\*    WillMenu == (p ~> <>menu)
-\*    WillTerminate == [](<><<~i \/ b>>_vars)
-\*    WillUpdate == ((in \/ out) ~> (<>u))
+\*LIVENESS
+	WillMenu == (p ~> <>menu)
+	WillTerminate == [](<><<~i \/ b>>_vars)
+	WillUpdate == ((in \/ out) ~> (<>u))
 end define
 
 procedure UpdateBalance(tsum) begin
