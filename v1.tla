@@ -82,7 +82,7 @@ fair process Main = "Main" begin
         end while;
 end process;
 
-fair process User = "USER" begin
+fair process User = "User" begin
     init:
         i := TRUE;
         input_pin := TRUE;
