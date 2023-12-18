@@ -47,11 +47,11 @@ end procedure;
 procedure Deposit() 
 begin
     s8:
-    c := TRUE;
+        c := TRUE;
     s9:
-    c := FALSE || in := TRUE || u := TRUE;
+        c := FALSE || in := TRUE || u := TRUE;
     s7:
-    balance := balance + sum_to_change;
+        balance := balance + sum_to_change;
     u := FALSE || in := FALSE || out := FALSE;
     return;
 end procedure;
