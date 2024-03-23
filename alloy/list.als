@@ -86,15 +86,18 @@ pred clear[now: Time] { let past = now.prev { all i: item - v_last[past] | i in 
 pred nop [t: Time] { noChange[t] }
 
 pred transitions[t: Time] {
-	pop_back[t] or nop[t] or 
-	(some e: item | push_back[t, e]) or 
-	pop_front[t] or 
-	(some e: item | push_front[t, e]) or 
-	clear[t]
+	//nop[t] or
+	//pop_back[t] or 
+	//(some e: item | push_back[t, e]) or 
+	//pop_front[t] or 
+	(some e: item | push_front[t, e])-- or 
+	//clear[t]
 }
 
 pred System { 
+	#item > 4
 	all t: Time - T/first | transitions [t] 
+	all t: Time | ListIsValid[t]
 	-- uncomment any of sanity-check predicates to check it
 	--sc1
 	--sc2
@@ -106,6 +109,24 @@ pred System {
 run {
 	System
 } for 5 but 2 Time 
+
+pred ListIsValid[t:Time] { -- Correctness Invariant
+	v_first[t] in List.elems.t -- L has the Head
+	v_last[t] in List.elems.t -- L has the Tail
+	all i: item | i in List.elems.t or i in List.deleted.t -- No initialize items
+	all i: List.elems.t | i not in List.deleted.t -- List item cannot be deleted
+	all i: List.deleted.t | i not in List.elems.t -- Deleted item cannot be in List
+	all i: List.elems.t - v_last[t] {
+		one i.(v_next[t]) -- Every List item has Next pointer
+		i.(v_next[t]) != i -- Acyclicity
+		v_last[t] in i.^(v_next[t]) -- Connectivity
+	}
+	all i: List.deleted.t {
+		no i.(v_next[t]) -- Deleted elements have no pointers to the List
+	}
+	all disj i,j: item - v_last[t]{ i.(v_next[t]) != j.(v_next[t]) } -- Linearity
+	List.Prev.t = ~(List.Next.t)  -- Double Linkage
+}
 
 ---------------------------
 -- Sanity-check predicates
