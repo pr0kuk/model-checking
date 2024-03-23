@@ -86,20 +86,55 @@ pred clear[now: Time] { let past = now.prev { all i: item - v_last[past] | i in 
 pred nop [t: Time] { noChange[t] }
 
 pred transitions[t: Time] {
-//	pop_back[t] or nop[t] or (some e: item | push_back[t, e]) or pop_front[t] or (some e: item | push_front[t, e]) or clear[t]
-//	nop[t]
-//	pop_back[t]
-//	some e: item | push_back[t, e]
-//	clear[t]
-//	pop_front[t]
-	some e: item | push_front[t, e]
+	pop_back[t] or nop[t] or 
+	(some e: item | push_back[t, e]) or 
+	pop_front[t] or 
+	(some e: item | push_front[t, e]) or 
+	clear[t]
 }
 
 pred System { 
 	all t: Time - T/first | transitions [t] 
+	-- uncomment any of sanity-check predicates to check it
+	--sc1
+	--sc2
+	--sc3
+	--sc4
+	--sc5
 }
 
 run {
 	System
-} for 2 but 2 Time 
+} for 5 but 2 Time 
+
+---------------------------
+-- Sanity-check predicates
+---------------------------
+
+pred sc1 [] {
+	-- deleting is possible
+	some t: Time | some deleted.t
+}
+pred sc2 [] {
+	-- full list is possible
+	some t: Time | no deleted.t
+}
+pred sc3 [] {
+	-- nop happens
+	some t: Time | noChange[t]
+}
+pred sc4 [] {
+	-- push happens
+	some t: Time | some e: item {
+		e in List.deleted.(t.prev)
+		e in List.elems.t
+	}
+}
+pred sc5 [] {
+	-- pop happens
+	some t: Time | some e: item {
+		e in List.elems.(t.prev)
+		e in List.deleted.t
+	}
+}
 
