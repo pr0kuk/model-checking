@@ -44,10 +44,28 @@ pred pop_back[now:Time] {
 }
 
 pred push_back[now:Time, e: item] {
-	e in Vector.deleted.now
 	let past = now.prev {
+		e in Vector.deleted.past
 		Vector.Last.now = e
+		(v_last[now]).(v_prev[now]) = v_last[past]
 		noChangeExcept2Items[now, v_last[past], v_last[now]]
+	}
+}
+
+pred pop_front[now:Time] {
+	let past = now.prev {
+		Vector.deleted.now = Vector.deleted.past + v_first[past]
+		Vector.First.now = (v_first[past]).(v_next[past])
+		noChangeExcept2Items[now, v_first[past], v_first[now]]
+	}
+}
+
+pred push_front[now:Time, e: item] {
+	let past = now.prev {
+		e in Vector.deleted.past
+		Vector.First.now = e
+		(v_first[now]).(v_next[now]) = v_first[past]
+		noChangeExcept2Items[now, v_first[past], v_first[now]]
 	}
 }
 
@@ -63,29 +81,25 @@ pred noChange [now: Time] {
 	}
 }
 
-
 pred clear[now: Time] { let past = now.prev { all i: item - v_last[past] | i in Vector.deleted.now }}
 
-pred init [t: Time] { no deleted.t }
-pred init2 [t: Time] { #deleted.t > 0 }
+//pred init [t: Time] { no deleted.t }
+//pred init2 [t: Time] { #deleted.t > 0 }
 pred nop [t: Time] { noChange[t] }
 pred transitions[t: Time] {
-//	pop_back[t] or nop[t] or (some e: item | push_back[t, e]) or clear[t]
+	pop_back[t] or nop[t] or (some e: item | push_back[t, e]) or pop_front[t] or (some e: item | push_front[t, e]) or clear[t]
 //	nop[t]
 //	pop_back[t]
 //	some e: item | push_back[t, e]
 //	clear[t]
+//	pop_front[t]
+//	some e: item | push_front[t, e]
 }
 
-pred System {
-	init [T/first]
-	//all t: Time | #elems.t > 1
-	//all t: Time | #deleted.t > 1
-	//all t: Time - T/first | #deleted.t > 0
-	//all t: Time | (#elems.t + #deleted.t) > 4
-	all t: Time - T/first | transitions [t]
+pred System { 
+	all t: Time - T/first | transitions [t] 
 }
 
 run {
 	System
-} for 9 but 2 Time 
+} for 2 but 2 Time 
