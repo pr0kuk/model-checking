@@ -83,9 +83,8 @@ pred noChange [now: Time] {
 
 pred clear[now: Time] { let past = now.prev { all i: item - v_last[past] | i in Vector.deleted.now }}
 
-//pred init [t: Time] { no deleted.t }
-//pred init2 [t: Time] { #deleted.t > 0 }
 pred nop [t: Time] { noChange[t] }
+
 pred transitions[t: Time] {
 	pop_back[t] or nop[t] or (some e: item | push_back[t, e]) or pop_front[t] or (some e: item | push_front[t, e]) or clear[t]
 //	nop[t]
@@ -103,3 +102,4 @@ pred System {
 run {
 	System
 } for 2 but 2 Time 
+
