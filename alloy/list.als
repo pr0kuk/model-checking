@@ -104,7 +104,7 @@ run {
 	eventually transitions
 
 	---------------------------
-	-- eventually !ListIsValid -- invariant check !SHOUULD RETURN NO INSTANCE FOUND!
+	-- eventually !ListIsValid -- invariant check !SHOULD RETURN "NO INSTANCE FOUND"!
 	---------------------------
 
 	-- uncomment any of sanity-check predicates to check it
