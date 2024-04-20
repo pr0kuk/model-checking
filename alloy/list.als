@@ -19,14 +19,13 @@ pred pop_back {
 		#elems > 2
 
 	--action
-		v_last' = (v_last).(v_prev)
-		List.deleted'= List.deleted + v_last
+		List.deleted' = List.deleted + v_last
 		List.elems' = List.elems - v_last
+		v_last' = v_last.v_prev
+		v_last'.v_prev' = v_last'.v_prev
+		no v_last'.v_next'
 
 	--postreq
-		v_last'.v_prev' = v_last'.v_prev
-		v_last'.v_prev.v_next = v_last'
-		no v_last'.v_next'
 		no v_last.v_next'
 		no v_last.v_prev'
 		v_first' = v_first
@@ -38,11 +37,11 @@ pred push_back[e: item] {
 		e in List.deleted
 
 	--action
+		List.deleted' = List.deleted - e
+		List.elems' = List.elems + e
 		v_last' = e
 		v_last'.v_prev' = v_last
 		v_last.v_next' = v_last'
-		List.deleted' = List.deleted - e
-		List.elems' = List.elems + e
 
 	--postreq
 		no v_last'.v_next'
@@ -56,13 +55,13 @@ pred pop_front {
 		#elems > 2
 
 	--action
-		v_first' = v_first.v_next
 		List.deleted' = List.deleted+ v_first
 		List.elems' = List.elems - v_first
-
-	--postreq
+		v_first' = v_first.v_next
 		v_first'.v_next' = v_first'.v_next
 		no v_first'.v_prev'
+
+	--postreq
 		no v_first.v_prev'
 		no v_first.v_next'
 		v_last' = v_last
@@ -74,16 +73,16 @@ pred push_front[e: item] {
 		e in List.deleted
 
 	--action
+		List.deleted' = List.deleted - e
+		List.elems' = List.elems + e
 		v_first' = e
 		v_first'.v_next' = v_first
 		v_first.v_prev' = v_first'
-		List.deleted' = List.deleted - e
-		List.elems' = List.elems + e
 
 	--postreq
-		v_last' = v_last
-		v_first.v_next'=v_first.v_next
 		no v_first'.v_prev'
+		v_first.v_next'=v_first.v_next
+		v_last' = v_last
 		noChangeExcept2Items[v_first, v_first']
 }
 
