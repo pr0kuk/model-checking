@@ -7,32 +7,12 @@ one sig List {
 	var Prev: item -> item,
 	var elems: set item,
 	var deleted: set item
-	}
+}
 
 fun v_next : item->item { List.Next }
 fun v_prev  : item->item { List.Prev }
 fun v_first  : one item { List.First }
 fun v_last  : one item { List.Last }
-
-pred ListIsValid {
-	always List.First in List.elems
-	always List.Last in List.elems
-	always List.First != List.Last
-	always no List.Last.v_next
-	always no List.Next.v_first
-	always all i: item | i in List.elems or i in List.deleted
-	always all i: List.elems | i not in List.deleted
-	always all i: List.deleted | i not in List.elems
-	always all i: List.deleted | no i.v_next
-	always all i: List.elems - List.Last {
-		one i.v_next
-		i.v_next != i
-		i.v_next not in List.deleted
-		List.Last in i.^v_next	
-	}
-	always all disj i,j: List.elems {(i.v_next) != (j.v_next)}
-	always {List.Prev = ~(List.Next)}
-}
 
 pred pop_back {
 	List.deleted'= List.deleted+ v_last
@@ -79,14 +59,34 @@ fact "init" {
 	#List.elems > 3
 }
 
+pred ListIsValid {
+	always List.First in List.elems
+	always List.Last in List.elems
+	always List.First != List.Last
+	always no List.Last.v_next
+	always no List.Next.v_first
+	always all i: item | i in List.elems or i in List.deleted
+	always all i: List.elems | i not in List.deleted
+	always all i: List.deleted | i not in List.elems
+	always all i: List.deleted | no i.v_next
+	always all i: List.elems - List.Last {
+		one i.v_next
+		i.v_next != i
+		i.v_next not in List.deleted
+		List.Last in i.^v_next	
+	}
+	always all disj i,j: List.elems {(i.v_next) != (j.v_next)}
+	always {List.Prev = ~(List.Next)}
+}
+
 pred System { 
 	eventually transitions
 	always ListIsValid
 	-- uncomment any of sanity-check predicates to check it
-//	sc1
-//	sc2
-//	sc3
-//	sc4
+	--sc1
+	--sc2
+	--sc3
+	--sc4
 }
 
 run {
@@ -96,7 +96,7 @@ run {
 ---------------------------
 -- Sanity-check predicates
 ---------------------------
-//
+
 pred sc1 [] {
 	-- deleting is possible
 	eventually some deleted
