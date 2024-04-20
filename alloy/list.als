@@ -15,28 +15,50 @@ fun v_first  : one item { List.First }
 fun v_last  : one item { List.Last }
 
 pred pop_back {
-	List.deleted'= List.deleted+ v_last
-	List.Last' = (v_last).(v_prev)
+	--prereq
+		#elems > 2
+
+	--action
+		List.deleted'= List.deleted+ v_last
+		List.Last' = (v_last).(v_prev)
+
+	--postreq
 	noChangeExcept2Items[v_last, v_last']
 }
 
 pred push_back[e: item] {
+	--prereq
 		e in List.deleted
+
+	--action
 		v_last' = e
 		(v_last').(v_prev') = v_last
+
+	--postreq
 		noChangeExcept2Items[v_last, v_last']
 }
 
 pred pop_front {
+	--prereq
+		#elems > 2
+
+	--action
 		List.deleted' = List.deleted+ v_first
 		List.First' = (v_first).(v_next)
+
+	--postreq
 		noChangeExcept2Items[v_first, v_first']
 }
 
 pred push_front[e: item] {
+	--prereq
 		e in List.deleted
+
+	--action
 		v_first' = e
 		(v_first').(v_next') = v_first
+
+	--postreq
 		noChangeExcept2Items[v_first, v_first']
 }
 
@@ -57,6 +79,7 @@ pred transitions {
 fact "init" {
 	#item > 4
 	#List.elems > 3
+	ListIsValid
 }
 
 pred ListIsValid {
@@ -81,12 +104,18 @@ pred ListIsValid {
 
 pred System { 
 	eventually transitions
-	always ListIsValid
+
+	---------------------------
+	-- eventually !ListIsValid -- invariant check !SHOUULD RETURN NO INSTANCE FOUND!
+	---------------------------
+
 	-- uncomment any of sanity-check predicates to check it
-	--sc1
-	--sc2
-	--sc3
-	--sc4
+	---------------------------
+	--sc1 -- deleting is possible
+	--sc2 -- full list is possible
+	--sc3 -- push happens
+	--sc4 -- pop happens
+	---------------------------
 }
 
 run {
