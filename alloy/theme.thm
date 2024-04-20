@@ -12,6 +12,7 @@
 <node>
    <type name="Int"/>
    <type name="item"/>
+   <type name="List"/>
    <type name="String"/>
    <type name="univ"/>
    <type name="seq/Int"/>
@@ -26,30 +27,13 @@
    <set name="elems" type="item"/>
 </node>
 
-<node showlabel="no" color="Green">
-   <set name="$sc3_e" type="item"/>
+<node showlabel="no">
+   <set name="$transitions_e" type="item"/>
 </node>
-
-<node style="Dashed">
-   <type name="List"/>
-</node>
-
-<edge color="Blue" style="Bold">
-   <relation name="First"> <type name="List"/> <type name="item"/> </relation>
-</edge>
-
-<edge color="Red" style="Bold">
-   <relation name="Last"> <type name="List"/> <type name="item"/> </relation>
-</edge>
 
 <edge merge="no" label="">
    <relation name="Next"> <type name="item"/> <type name="item"/> </relation>
    <relation name="Prev"> <type name="item"/> <type name="item"/> </relation>
-</edge>
-
-<edge visible="no" attribute="yes">
-   <relation name="deleted"> <type name="List"/> <type name="item"/> </relation>
-   <relation name="elems"> <type name="List"/> <type name="item"/> </relation>
 </edge>
 
 <edge visible="no" label="">
