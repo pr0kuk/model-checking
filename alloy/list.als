@@ -144,7 +144,6 @@ fact "init" {
 
 run {
 
-	--always ListIsValid
 	 always transitions
 
 	---------------------------
