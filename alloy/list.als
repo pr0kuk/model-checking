@@ -62,13 +62,13 @@ pred push_front[e: item] {
 		noChangeExcept2Items[v_first, v_first']
 }
 
+pred clear{ all i: item - v_last - v_first | i in List.deleted' }
+
 pred noChangeExcept2Items [i1, i2: item] { all i:item - i1 - i2 {i.(v_next') = i.(v_next)} }
 
 pred noChange { all i:item {i.(v_next') = i.(v_next)} }
 
-pred clear{ all i: item - v_last - v_first | i in List.deleted' }
-
-pred transitions {
+pred transitions { -- all possible actions with a List
 	pop_back or 
 	(some e: item | push_back[e]) or 
 	pop_front or 
