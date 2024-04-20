@@ -1,12 +1,12 @@
 module list
 sig item {}
 one sig List {
-	var First: one item,
-	var Last: one item,
+	var First: one item, -- list head
+	var Last: one item, -- list tail
 	var Next: item -> item,
 	var Prev: item -> item,
-	var elems: set item,
-	var deleted: set item
+	var elems: set item, -- items belong to the list
+	var deleted: set item -- items do not belong to the list
 }
 
 fun v_next : item->item { List.Next }
@@ -76,33 +76,31 @@ pred transitions {
 	clear
 }
 
+pred ListIsValid {
+	always List.First in List.elems -- L has the Head
+	always List.Last in List.elems -- L has the Tail
+	always List.First != List.Last -- Acyclicity
+	always List.Prev = ~(List.Next) -- Double Linkage
+	always no List.Last.v_next -- Last is a Tail
+	always no List.Next.v_first -- First is a Head
+	always all i: item | i in List.elems or i in List.deleted -- The union of Elems and Deleted is a complete set
+	always all i: List.elems | i not in List.deleted -- Elems and Deleted are non-crossing sets
+	always all i: List.deleted | i not in List.elems -- Elems and Deleted are non-crossing sets
+	always all i: List.deleted | no i.v_next -- Unconnectivity of Deleted
+	always all i: List.elems - List.Last  | i.v_next != i -- Acyclicity
+	always all i: List.elems - List.Last  | one i.v_next -- Connectivity
+	always all i: List.elems - List.Last  | i.v_next not in List.deleted -- Connectivity
+	always all i: List.elems - List.Last  | List.Last in i.^v_next	-- Connectivity
+	always all disj i,j: List.elems {(i.v_next) != (j.v_next)} -- Linearity
+}
+
 fact "init" {
 	#item > 4
 	#List.elems > 3
 	ListIsValid
 }
 
-pred ListIsValid {
-	always List.First in List.elems
-	always List.Last in List.elems
-	always List.First != List.Last
-	always no List.Last.v_next
-	always no List.Next.v_first
-	always all i: item | i in List.elems or i in List.deleted
-	always all i: List.elems | i not in List.deleted
-	always all i: List.deleted | i not in List.elems
-	always all i: List.deleted | no i.v_next
-	always all i: List.elems - List.Last {
-		one i.v_next
-		i.v_next != i
-		i.v_next not in List.deleted
-		List.Last in i.^v_next	
-	}
-	always all disj i,j: List.elems {(i.v_next) != (j.v_next)}
-	always {List.Prev = ~(List.Next)}
-}
-
-pred System { 
+run {
 	eventually transitions
 
 	---------------------------
@@ -116,10 +114,7 @@ pred System {
 	--sc3 -- push happens
 	--sc4 -- pop happens
 	---------------------------
-}
 
-run {
-	System
 } for 5 but 1..2 steps
 
 ---------------------------
