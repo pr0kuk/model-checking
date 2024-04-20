@@ -55,7 +55,7 @@ pred pop_front {
 		#elems > 2
 
 	--action
-		List.deleted' = List.deleted+ v_first
+		List.deleted' = List.deleted + v_first
 		List.elems' = List.elems - v_first
 		v_first' = v_first.v_next
 		v_first'.v_next' = v_first'.v_next
@@ -81,7 +81,7 @@ pred push_front[e: item] {
 
 	--postreq
 		no v_first'.v_prev'
-		v_first.v_next'=v_first.v_next
+		v_first.v_next' = v_first.v_next
 		v_last' = v_last
 		noChangeExcept2Items[v_first, v_first']
 }
@@ -92,14 +92,14 @@ pred clear{
 	--action
 		all i: item - v_last - v_first | i in List.deleted' 
 		List.deleted' = item - v_last - v_first
-		List.elems' =v_last + v_first
+		List.elems' = v_last + v_first
 
 	--postreq
 		all i : List.deleted' | no i.v_next' && no i.v_prev'
 		v_last' = v_last
 		v_first' = v_first
-		v_first'.v_next'=v_last'
-		v_last'.v_prev'=v_first'
+		v_first'.v_next' = v_last'
+		v_last'.v_prev' =v_first'
 		no v_first'.v_prev'
 		no v_last'.v_next'
 }
