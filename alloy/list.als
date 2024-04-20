@@ -119,12 +119,12 @@ pred transitions { -- all possible actions with a List
 
 pred ListIsValid {
 	#List.elems > 1
-	List.First in List.elems -- L has the Head
-	List.Last in List.elems -- L has the Tail
-	List.First != List.Last -- Acyclicity
-	List.Prev = ~(List.Next) -- Double Linkage
-	no List.Last.v_next -- Last is a Tail
-	no List.Next.v_first -- First is a Head
+	v_first in List.elems -- L has the Head
+	v_last in List.elems -- L has the Tail
+	v_first != v_last -- Acyclicity
+	v_prev = ~v_next -- Double Linkage
+	no v_last.v_next -- Last is a Tail
+	no v_first.v_prev -- First is a Head
 	all i: item | i in List.elems or i in List.deleted -- The union of Elems and Deleted is a complete set
 	all i: List.elems | i not in List.deleted -- Elems and Deleted are non-crossing sets
 	all i: List.deleted | i not in List.elems -- Elems and Deleted are non-crossing sets
@@ -133,7 +133,7 @@ pred ListIsValid {
 	all i: List.elems - List.Last  | one i.v_next -- Connectivity
 	all i: List.elems - List.Last  | i.v_next not in List.deleted -- Connectivity
 	all i: List.elems - List.Last  | List.Last in i.^v_next	-- Connectivity
-	all disj i,j: List.elems {(i.v_next) != (j.v_next)} -- Linearity
+	all disj i,j: List.elems | i.v_next != j.v_next -- Linearity
 }
 
 fact "init" {
