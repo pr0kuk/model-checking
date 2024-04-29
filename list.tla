@@ -65,10 +65,7 @@ end define
 procedure pop_back() 
 begin
     pop_back: if Cardinality(AllListElems) > 2 then
-        ss2: elems[first].st := "deleted";
-        ss3: first := elems[first].n;
-        ss0: elems[first].n := -1;
-        ss1: elems[first].p := -1;
+        elems[first].st := "deleted" || first := elems[first].n || elems[first].n := -1 ||elems[first].p := -1;
     end if;
 end procedure;
 
@@ -107,8 +104,8 @@ fair process Main = "Main" begin
     end either;
 end process;
 
-fair process User = "User" begin
-    s1: first := 7;
-end process;
+\*fair process User = "User" begin
+\*    s1: first := 7;
+\*end process;
 end algorithm;*)
 ====
