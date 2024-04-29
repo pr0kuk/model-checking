@@ -1,16 +1,11 @@
 --------------------------------- MODULE list ---------------------------------
-EXTENDS Integers, TLC, Sequences
+EXTENDS Integers, TLC, Sequences, FiniteSets
 Elem_num == 5
 Status == {"in_list", "deleted"}
 Number == 1..Elem_num
 Prev_v == 1..Elem_num
 Next_v == 1..Elem_num
 Elems == [i: Number, p: Prev_v, n: Next_v, st: Status]
-
-ELM(number, prev, next, status) == [i |-> number, p |-> prev, n |-> next, st |-> status]
-fPrev(i) == Elems[i].p
-fNext(i) == Elems[i].n
-ElemWithNumber(i) == ELM(i, fPrev(i), fNext(i), "in_list")
 
 IsInList(elem) ==
     LET ST == "in_list"
@@ -20,77 +15,96 @@ IsDeleted(elem) ==
     LET ST == "deleted"
     IN ST \in Status /\ elem.st = ST
 
-NextElemNumber(elem) == elem.next
-PrevElemNumber(elem) == elem.prev
 
-ForEach(op(_,_), acc) ==
-    LET getelem[i \in Number] ==
-        IF i = Elem_num THEN acc
-        ELSE
-            LET elem == ElemWithNumber(i)
-            IN op(elem, getelem[NextElemNumber(elem)])
-    IN getelem[1]
-
-AllElems == ForEach(LAMBDA b, acc: {b} \union acc, {})
-AllListElems == ForEach(LAMBDA b, acc: IF IsInList(b) THEN {b} \union acc ELSE acc, {})
-AllDeleted == ForEach(LAMBDA b, acc: IF IsDeleted(b) THEN {b} \union acc ELSE acc, {})
-
-
-
+InitialList == [i \in Number |-> CHOOSE e: e \in Elems]
 
 (*--fair algorithm list
 variables
+    elems = InitialList,
     first \in 1..Elem_num,
     last \in 1..Elem_num,
 define
+    ForEach(op(_,_), acc) ==
+        LET getelem[i \in Number] ==
+            IF i = Elem_num THEN acc
+            ELSE
+                LET elem == elems[i]
+                IN op(elem, getelem[elems[i].n])
+        IN getelem[1]
+    
+    AllElems == ForEach(LAMBDA b, acc: {b} \union acc, {})
+    AllListElems == ForEach(LAMBDA b, acc: IF IsInList(b) THEN {b} \union acc ELSE acc, {})
+    AllDeleted == ForEach(LAMBDA b, acc: IF IsDeleted(b) THEN {b} \union acc ELSE acc, {})
+
     \* invariants
-    HavingHead == (Elems[first].st = "in_list")
-    HavingTail == (Elems[last].st = "in_list")
+    HavingHead == (elems[first].st = "in_list")
+    HavingTail == (elems[last].st = "in_list")
     Acyclicity == ~(first = last)
     Linearity == \A e \in AllListElems: ~(e.n = e.p)
-    LastIsTail == (Elems[last].n = -1)
-    FirstIsHead == (Elems[first].p = -1)
+    LastIsTail == (elems[last].n = -1)
+    FirstIsHead == (elems[first].p = -1)
     DeletedUnconnectivity == 
         \A e \in AllDeleted:
-            (Elems[e].n = -1) /\ (Elems[e].p = -1)
+            (elems[e].n = -1) /\ (elems[e].p = -1)
     Acyclicity2 ==
         \A e \in AllListElems:
-            (~(Elems[e].n = e.i)) /\ (~(Elems[e].p = e.i))
+            (~(elems[e].n = e.i)) /\ (~(elems[e].p = e.i))
     Connectivity ==
-        (\A e \in AllListElems \ Elems[first]: Elems[e].p \in Number)
+        (\A e \in AllListElems \ elems[first]: elems[e].p \in Number)
         /\
-        (\A e \in AllListElems \ Elems[last]: Elems[e].n \in Number)
+        (\A e \in AllListElems \ elems[last]: elems[e].n \in Number)
    DoubleLinkage ==
-        (\A e \in AllListElems \ Elems[first]: Elems[Elems[e].p].n = e.i)
+        (\A e \in AllListElems \ elems[first]: elems[elems[e].p].n = e.i)
         /\
-        (\A e \in AllListElems \ Elems[last]: Elems[Elems[e].n].p = e.i)
+        (\A e \in AllListElems \ elems[last]: elems[elems[e].n].p = e.i)
    \*Connectivity2
    
 end define
 
 
-\*procedure pop_back() 
-\*begin
-\*end procedure;
-\*
-\*procedure pop_front() 
-\*begin
-\*end procedure;
-\*
-\*procedure push_back() 
-\*begin
-\*end procedure;
-\*
-\*procedure push_front() 
-\*begin
-\*end procedure;
-\*
-\*procedure clear() 
-\*begin
-\*end procedure;
+procedure pop_back() 
+begin
+    pop_back: if Cardinality(AllListElems) > 2 then
+        ss2: elems[first].st := "deleted";
+        ss3: first := elems[first].n;
+        ss0: elems[first].n := -1;
+        ss1: elems[first].p := -1;
+    end if;
+end procedure;
+
+procedure pop_front() 
+begin
+    ss2: first := 7;
+end procedure;
+
+procedure push_back() 
+begin
+    ss3: first := 7;
+end procedure;
+
+procedure push_front() 
+begin
+    ss4: first := 7;
+end procedure;
+
+procedure clear() 
+begin
+    ss5: first := 7;
+end procedure;
 
 fair process Main = "Main" begin
-    s0: first := 6;
+    main_loop:
+    either
+        call pop_back();
+    or
+        call pop_front();
+    or
+        call push_back();
+    or
+        call push_front();
+    or
+        call clear();
+    end either;
 end process;
 
 fair process User = "User" begin
