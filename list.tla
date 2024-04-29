@@ -36,13 +36,37 @@ AllListElems == ForEach(LAMBDA b, acc: IF IsInList(b) THEN {b} \union acc ELSE a
 AllDeleted == ForEach(LAMBDA b, acc: IF IsDeleted(b) THEN {b} \union acc ELSE acc, {})
 
 
+
+
 (*--fair algorithm list
 variables
     first \in 1..Elem_num,
     last \in 1..Elem_num,
-\*define
-\*
-\*end define
+define
+    \* invariants
+    HavingHead == (Elems[first].st = "in_list")
+    HavingTail == (Elems[last].st = "in_list")
+    Acyclicity == ~(first = last)
+    Linearity == \A e \in AllListElems: ~(e.n = e.p)
+    LastIsTail == (Elems[last].n = -1)
+    FirstIsHead == (Elems[first].p = -1)
+    DeletedUnconnectivity == 
+        \A e \in AllDeleted:
+            (Elems[e].n = -1) /\ (Elems[e].p = -1)
+    Acyclicity2 ==
+        \A e \in AllListElems:
+            (~(Elems[e].n = e.i)) /\ (~(Elems[e].p = e.i))
+    Connectivity ==
+        (\A e \in AllListElems \ Elems[first]: Elems[e].p \in Number)
+        /\
+        (\A e \in AllListElems \ Elems[last]: Elems[e].n \in Number)
+   DoubleLinkage ==
+        (\A e \in AllListElems \ Elems[first]: Elems[Elems[e].p].n = e.i)
+        /\
+        (\A e \in AllListElems \ Elems[last]: Elems[Elems[e].n].p = e.i)
+   \*Connectivity2
+   
+end define
 
 
 \*procedure pop_back() 
@@ -73,46 +97,4 @@ fair process User = "User" begin
     s1: first := 7;
 end process;
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "b915c4c1" /\ chksum(tla) = "ce76ac44")
-VARIABLES first, last, pc
-
-vars == << first, last, pc >>
-
-ProcSet == {"Main"} \cup {"User"}
-
-Init == (* Global variables *)
-        /\ first \in 1..Elem_num
-        /\ last \in 1..Elem_num
-        /\ pc = [self \in ProcSet |-> CASE self = "Main" -> "s0"
-                                        [] self = "User" -> "s1"]
-
-s0 == /\ pc["Main"] = "s0"
-      /\ first' = 6
-      /\ pc' = [pc EXCEPT !["Main"] = "Done"]
-      /\ last' = last
-
-Main == s0
-
-s1 == /\ pc["User"] = "s1"
-      /\ first' = 7
-      /\ pc' = [pc EXCEPT !["User"] = "Done"]
-      /\ last' = last
-
-User == s1
-
-(* Allow infinite stuttering to prevent deadlock on termination. *)
-Terminating == /\ \A self \in ProcSet: pc[self] = "Done"
-               /\ UNCHANGED vars
-
-Next == Main \/ User
-           \/ Terminating
-
-Spec == /\ Init /\ [][Next]_vars
-        /\ WF_vars(Next)
-        /\ WF_vars(Main)
-        /\ WF_vars(User)
-
-Termination == <>(\A self \in ProcSet: pc[self] = "Done")
-
-\* END TRANSLATION 
 ====
