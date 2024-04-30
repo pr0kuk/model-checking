@@ -111,9 +111,5 @@ fair process Main = "Main" begin
     end either;
     end_main_loop: goto main_loop;
 end process;
-
-\*fair process User = "User" begin
-\*    s1: first := 7;
-\*end process;
 end algorithm;*)
 ====
