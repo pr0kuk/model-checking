@@ -18,7 +18,7 @@ variables
 define
     ForEach(op(_,_), acc) ==
         LET getelem[i \in Number] ==
-            IF i = Elem_num THEN acc
+            IF i = Elem_num THEN op(elems[i], acc)
             ELSE
                 LET elem == elems[i]
                 IN op(elem, getelem[elem.i + 1])
