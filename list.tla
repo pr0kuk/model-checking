@@ -16,6 +16,7 @@ variables
     first = 1,
     last = Elem_num,
 define
+    \* ForEach by numbers of nodes
     ForEach(op(_,_), acc) ==
         LET getelem[i \in Number] ==
             IF i = Elem_num THEN op(elems[i], acc)
@@ -23,6 +24,15 @@ define
                 LET elem == elems[i]
                 IN op(elem, getelem[elem.i + 1])
         IN getelem[1]
+    
+    \* ForEach by pointers of nodes
+    ForEach2(op(_,_), acc) ==
+        LET getelem[i \in Number] ==
+            IF i = last THEN op(elems[i], acc)
+            ELSE
+                LET elem == elems[i]
+                IN op(elem, getelem[elem.n])
+        IN getelem[first]
     
     AllElems == ForEach(LAMBDA b, acc: {b} \union acc, {})
     AllListElems == ForEach(LAMBDA b, acc: IF IsInList(b) THEN {b} \union acc ELSE acc, {})
