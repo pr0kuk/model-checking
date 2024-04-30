@@ -37,6 +37,7 @@ define
     AllElems == ForEach(LAMBDA b, acc: {b} \union acc, {})
     AllListElems == ForEach(LAMBDA b, acc: IF IsInList(b) THEN {b} \union acc ELSE acc, {})
     AllDeleted == ForEach(LAMBDA b, acc: IF IsDeleted(b) THEN {b} \union acc ELSE acc, {})
+    AllInnerListElems == ForEach(LAMBDA b, acc: IF IsInList(b) /\ ~(b.i = first) /\ ~(b.i = last) THEN {b} \union acc ELSE acc, {})
 
     \* invariants
     HavingHead == (elems[first].st = "in_list")
