@@ -6,16 +6,8 @@ Number == 1..Elem_num
 Prev_v == 0..Elem_num
 Next_v == 0..Elem_num
 Elems == [i: Number, p: Prev_v, n: Next_v, st: Status]
-
-IsInList(elem) ==
-    LET ST == "in_list"
-    IN ST \in Status /\ elem.st = ST
-
-IsDeleted(elem) ==
-    LET ST == "deleted"
-    IN ST \in Status /\ elem.st = ST
-
-
+IsInList(elem) == "in_list" \in Status /\ elem.st = "in_list"
+IsDeleted(elem) == "deleted" \in Status /\ elem.st = "deleted"
 InitialList == [i \in Number |-> CHOOSE e \in Elems: e.i = i /\ e.p = i - 1 /\ (e.n = i + 1 \/ (e.n = 0 /\ e.i = Elem_num))]
 
 (*--fair algorithm list
