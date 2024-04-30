@@ -55,48 +55,59 @@ define
 end define
 
 
-procedure pop_back() 
+macro pop_back() 
 begin
-    pop_back: if Cardinality(AllListElems) > 2 then
-        elems[last].st := "deleted" || elems[elems[last].p].n := 0 || last := elems[last].p || elems[last].p := 0;
-    end if;
-end procedure;
+    elems[last].st := "deleted" || elems[elems[last].p].n := 0 || last := elems[last].p || elems[last].p := 0;
+end macro;
 
-procedure pop_front() 
+macro pop_front() 
 begin
-    pop_front: if Cardinality(AllListElems) > 2 then
-        elems[first].st := "deleted" || elems[elems[first].n].p := 0 || first := elems[first].n || elems[first].n := 0;
-    end if;
+    elems[first].st := "deleted" || elems[elems[first].n].p := 0 || first := elems[first].n || elems[first].n := 0;
+end macro;
+
+macro push_back(e) 
+begin
+    elems[e.i].st := "in_list" || elems[last].n := e.i || last := e.i || elems[e.i].p := last;
+end macro;
+
+macro push_front(e) 
+begin
+    elems[e.i].st := "in_list" || elems[first].p := e.i || first := e.i || elems[e.i].n := first;
+end macro;
+
+procedure clear() 
+begin
+    clear: while Cardinality(AllListElems) > 2 do
+        with e \in AllInnerListElems do
+            elems[e.i].st := "deleted" || elems[e.i].n := 0 || elems[e.i].p := 0 || elems[elems[e.i].p].n := elems[elems[e.i].n].i || elems[elems[e.i].n].p := elems[elems[e.i].p].i;
+        end with
+    end while
 end procedure;
-\*
-\*procedure push_back() 
-\*begin
-\*    ss3: first := 3;
-\*end procedure;
-\*
-\*procedure push_front() 
-\*begin
-\*    ss4: first := 3;
-\*end procedure;
-\*
-\*procedure clear() 
-\*begin
-\*    ss5: first := 3;
-\*end procedure;
 
 fair process Main = "Main" begin
     main_loop:
-
     either
-        call pop_back();
+        if Cardinality(AllListElems) > 2 then
+            pop_back: pop_back();
+        end if;
     or
-        call pop_front();
-\*    or
-\*        call push_back();
-\*    or
-\*        call push_front();
-\*    or
-\*        call clear();
+        if Cardinality(AllListElems) > 2 then
+            pop_front: pop_front();
+        end if;
+    or
+        if Cardinality(AllDeleted) > 0 then
+            push_back: with e \in AllDeleted do
+                push_back(e);
+            end with;
+        end if;
+    or
+        if Cardinality(AllDeleted) > 0 then
+            push_front: with e \in AllDeleted do
+                push_front(e);
+            end with;
+        end if;
+    or
+        call clear();
     end either;
 end process;
 
