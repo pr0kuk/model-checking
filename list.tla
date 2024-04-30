@@ -46,22 +46,12 @@ define
     Linearity == \A e \in AllListElems: ~(e.n = e.p)
     LastIsTail == (elems[last].n = 0)
     FirstIsHead == (elems[first].p = 0)
-    DeletedUnconnectivity == 
-        \A e \in AllDeleted:
-            (e.n = 0) /\ (e.p = 0)
-    Acyclicity2 ==
-        \A e \in AllListElems:
-            (~(e.n = e.i)) /\ (~(e.p = e.i))
-    Connectivity ==
-        (\A e \in AllListElems: e.p \in 1..Elem_num \/ (e.p = 0 /\ e.i = first))
-        /\
-        (\A e \in AllListElems: e.n \in 1..Elem_num \/ (e.n = 0 /\ e.i = last))
-   DoubleLinkage ==
-         (\A e \in AllListElems: e.i = first \/ elems[e.p].n = e.i)
-         /\
-         (\A e \in AllListElems: e.i = last \/ elems[e.n].p = e.i)
-   \*Connectivity2
-   invariants == HavingHead /\ HavingTail /\ Acyclicity /\ Acyclicity2 /\ Linearity /\ LastIsTail /\ FirstIsHead /\ DeletedUnconnectivity /\ Connectivity /\ DoubleLinkage
+    DeletedUnconnectivity ==  \A e \in AllDeleted: (e.n = 0) /\ (e.p = 0)
+    Acyclicity2 == \A e \in AllListElems: (~(e.n = e.i)) /\ (~(e.p = e.i))
+    Connectivity == (\A e \in AllListElems: e.p \in Number \/ (e.p = 0 /\ e.i = first)) /\ (\A e \in AllListElems: e.n \in Number \/ (e.n = 0 /\ e.i = last))
+    DoubleLinkage == (\A e \in AllListElems: e.i = first \/ elems[e.p].n = e.i) /\ (\A e \in AllListElems: e.i = last \/ elems[e.n].p = e.i)
+    Connectivity2 == (elems[last] \in ForEach2(LAMBDA b, acc: {b} \union acc, {}))
+    invariants == HavingHead /\ HavingTail /\ Acyclicity /\ Acyclicity2 /\ Linearity /\ LastIsTail /\ FirstIsHead /\ DeletedUnconnectivity /\ Connectivity /\ DoubleLinkage /\ Connectivity2
 end define
 
 
