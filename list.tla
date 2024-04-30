@@ -84,25 +84,25 @@ begin
     end while
 end procedure;
 
-fair process Main = "Main" begin
+fair process Main \in 1..2 begin
     main_loop:
     either
-        if Cardinality(AllListElems) > 2 then
-            pop_back: pop_back();
+        pop_back: if Cardinality(AllListElems) > 2 then
+            pop_back();
         end if;
     or
-        if Cardinality(AllListElems) > 2 then
-            pop_front: pop_front();
+        pop_front: if Cardinality(AllListElems) > 2 then
+            pop_front();
         end if;
     or
-        if Cardinality(AllDeleted) > 0 then
-            push_back: with e \in AllDeleted do
+        push_back: if Cardinality(AllDeleted) > 0 then
+            with e \in AllDeleted do
                 push_back(e);
             end with;
         end if;
     or
-        if Cardinality(AllDeleted) > 0 then
-            push_front: with e \in AllDeleted do
+        push_front: if Cardinality(AllDeleted) > 0 then
+            with e \in AllDeleted do
                 push_front(e);
             end with;
         end if;
