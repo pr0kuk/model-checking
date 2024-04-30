@@ -109,6 +109,7 @@ fair process Main = "Main" begin
     or
         call clear();
     end either;
+    end_main_loop: goto main_loop;
 end process;
 
 \*fair process User = "User" begin
