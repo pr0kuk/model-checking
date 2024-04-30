@@ -62,17 +62,19 @@ define
 end define
 
 
-\*procedure pop_back() 
-\*begin
-\*    pop_back: if Cardinality(AllListElems) > 2 then
-\*        elems[first].st := "deleted" || elems[elems[first].n].p := 0 || first := elems[first].n || elems[first].n := 0;
-\*    end if;
-\*end procedure;
-\*
-\*procedure pop_front() 
-\*begin
-\*    ss2: first := 3;
-\*end procedure;
+procedure pop_back() 
+begin
+    pop_back: if Cardinality(AllListElems) > 2 then
+        elems[last].st := "deleted" || elems[elems[last].p].n := 0 || last := elems[last].p || elems[last].p := 0;
+    end if;
+end procedure;
+
+procedure pop_front() 
+begin
+    pop_front: if Cardinality(AllListElems) > 2 then
+        elems[first].st := "deleted" || elems[elems[first].n].p := 0 || first := elems[first].n || elems[first].n := 0;
+    end if;
+end procedure;
 \*
 \*procedure push_back() 
 \*begin
@@ -91,18 +93,18 @@ end define
 
 fair process Main = "Main" begin
     main_loop:
-    first := 1;
-\*    either
-\*        call pop_back();
-\*    or
-\*        call pop_front();
+
+    either
+        call pop_back();
+    or
+        call pop_front();
 \*    or
 \*        call push_back();
 \*    or
 \*        call push_front();
 \*    or
 \*        call clear();
-\*    end either;
+    end either;
 end process;
 
 \*fair process User = "User" begin
